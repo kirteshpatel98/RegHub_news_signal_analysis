@@ -1,5 +1,6 @@
 # Import necessary libraries
 import base64
+import pandas as pd
 from langchain.llms import Ollama
 
 # Define necessary functions
@@ -66,22 +67,31 @@ def split_cat_df(df, cats):
 
     categories = list(cats.columns)
     dfs_split = {}
-    
     for category in categories:
         df_split = df[df['rule_labels_comb'].apply(lambda lst: category in lst)]
         dfs_split[category] = df_split
 
     return dfs_split
 
-def llama2_base(prompt):
+def create_llama2_cols(df_dict, df_prompts):
     """
-    Function to specify llama model.
+    DDD
     """
 
-    # Import the local model (ollama distribution)
-    ollama = Ollama(base_url="http://localhost:11434", model="llama2")
+    # Import model
+    model = Ollama(base_url="http://localhost:11434", model="llama2")
 
-    # Prompt the model
-    answer = ollama(prompt)
-
-    return answer
+    # Loop through the four category dfs, create and ask model
+    dfs_llm_split = []
+    for key, df in df_dict.items():
+        df = df[["id", "news_content"]].copy()
+        df[f"{key}_prompt"] = df["news_content"] + df_prompts[key][0]
+        df[f"{key}_llama"] = ""
+        # Result for each row
+        df[f"{key}_llama"
+        ] = df.apply(lambda row: model(row[f"{key}_prompt"]), axis=1)
+        # Some reshaping and storing the results
+        df.drop(columns="news_content", inplace=True)
+        dfs_llm_split.append(df)
+        
+    return dfs_llm_split
