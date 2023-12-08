@@ -35,6 +35,10 @@ class awsOps:
     def upload_file(self, bucket, path, name):
         self.s3.upload_file(path, bucket, name)
         return "File uploaded"
+    
+    def delete_file(self, bucket, file):
+        self.s3.delete_object(Bucket=bucket, Key=file)
+        return "File deleted"
 
     def get_df(self, bucket, file):
         response = self.s3.get_object(Bucket=bucket, Key=file)
