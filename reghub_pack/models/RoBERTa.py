@@ -2,8 +2,6 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from transformers import BertTokenizer
-from transformers import BertForSequenceClassification, AdamW
 
 import torchsummary as summary
 from tqdm import tqdm
@@ -13,8 +11,7 @@ from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from torch import nn
 import torch.nn.functional as F
-from transformers import BertModel
-from transformers import BertTokenizer
+from transformers import RobertaModel
 
 from sklearn.model_selection import train_test_split
 import torch
@@ -35,18 +32,17 @@ warnings.filterwarnings("ignore")
 import json
 from ..Dataset import *
 from ..general_functions import *
-from ..tokenizer import tokenizer_BERT
-
+from ..tokenizer import tokenizer_RoBERTa
 
 
 # BERT classifier architecture, with 7 output classes
-class BertClassifier(nn.Module):
+class RoBERTaClassifier(nn.Module):
 
     def __init__(self, dropout=0.5):
 
-        super(BertClassifier, self).__init__()
+        super(RoBERTaClassifier, self).__init__()
 
-        self.bert = BertModel.from_pretrained('bert-base-uncased')
+        self.bert = RobertaModel.from_pretrained('roberta-base')
         self.dropout = nn.Dropout(dropout)
         self.linear = nn.Linear(768, 9)
         torch.nn.init.kaiming_uniform_(self.linear.weight, nonlinearity='relu')
@@ -79,15 +75,15 @@ class BertClassifier(nn.Module):
 
 
 
-class BERT_RegHub(BertClassifier):
+class RoBERTa_RegHub(RoBERTaClassifier):
     def __init__(self,):            
-        BertClassifier.__init__(self)
+        RoBERTaClassifier.__init__(self)
         use_cuda = torch.cuda.is_available()
         device = torch.device("cuda" if use_cuda else "cpu")
         self.device=device
         self.to(self.device)
         
-    def load_model(self,model_name='BERT_classifier.pth',torch=torch,from_aws=False):
+    def load_model(self,model_name='RoBERTa_classifier.pth',torch=torch,from_aws=False):
         if from_aws:
             with open("../aws_credentials.json", 'r') as file:
                 aws_creds_json = json.load(file)
@@ -124,7 +120,7 @@ class BERT_RegHub(BertClassifier):
         self.optimizer=optimizer(self.parameters(), lr= self.LR)
                 
               
-    def pre_load(self, train_data=None, val_data=None, batch_size=32,Dataset=Dataset,DataLoader=DataLoader,tokenizer=tokenizer_BERT):
+    def pre_load(self, train_data=None, val_data=None, batch_size=32,Dataset=Dataset,DataLoader=DataLoader,tokenizer=tokenizer_RoBERTa):
         
         self.batch_size=batch_size
         self.train_data=train_data
@@ -300,25 +296,25 @@ class BERT_RegHub(BertClassifier):
         # model checkpoint
         checkpoint = {'epoch': self.epoch_num+1, 'model_state_dict': self.state_dict() }
 
-        torch.save(checkpoint, f'BERT_checkpoint_epoch{self.epoch_num+1}.pth')
+        torch.save(checkpoint, f'RoBERTa_checkpoint_epoch{self.epoch_num+1}.pth')
 
         
         
         
-    def save_best_model(self,save_aws=True,name='BERT_classifier.pth'):
+    def save_best_model(self,save_aws=True,name='RoBERTa_classifier.pth'):
         # retrieve best checkpoint model
         self.name=name
-        checkpoint = torch.load(f'BERT_checkpoint_epoch{self.epoch_num+1-2}.pth')
+        checkpoint = torch.load(f'RoBERTa_checkpoint_epoch{self.epoch_num+1-2}.pth')
         
         # self.load_state_dict(checkpoint['model_state_dict'])
 
 
         # save best model
-        torch.save(checkpoint, 'BERT_classifier.pth')
+        torch.save(checkpoint, 'RoBERTa_classifier.pth')
         # torch.save(self, self.name)
         
         # delete remaining model checkpoints
-        for f in glob.glob("BERT_checkpoint*.pth"):
+        for f in glob.glob("RoBERTa_checkpoint*.pth"):
             os.remove(f)
         
         if save_aws:
@@ -333,7 +329,7 @@ class BERT_RegHub(BertClassifier):
         
     
     
-    def classifier(self,F=F,torch=torch,input_text="Commerzbank faced bankrupcy today",table_format=False,df_test=None,Dataset=Dataset,pd=pd,custom_model=None,tokenizer=tokenizer_BERT):
+    def classifier(self,F=F,torch=torch,input_text="Commerzbank faced bankrupcy today",table_format=False,df_test=None,Dataset=Dataset,pd=pd,custom_model=None,tokenizer=tokenizer_RoBERTa):
         
         if custom_model != None:
             self.load_model(model_name=custom_model,torch=torch)

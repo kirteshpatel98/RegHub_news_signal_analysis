@@ -3,13 +3,10 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from transformers import BertTokenizer
 
 from torch.utils.data import DataLoader
 from torch import nn
 import torch.nn.functional as F
-from transformers import BertModel
-from transformers import BertTokenizer
 
 import torch
 
@@ -26,10 +23,8 @@ warnings.filterwarnings("ignore")
 
 
 
-# import BERT tokenizer
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self,df):
+    def __init__(self,df,tokenizer):
         self.labels=df['target']
         self.text=[tokenizer(text,padding='max_length',truncation=True,return_tensors="pt") for text in df['news_content']]
 
@@ -53,3 +48,4 @@ class Dataset(torch.utils.data.Dataset):
         batch_y = self.get_batch_labels(idx)
 
         return batch_texts, batch_y
+    
