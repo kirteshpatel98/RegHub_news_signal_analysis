@@ -12,3 +12,12 @@ asd
 sdf
 ### reghub_pack
 sdf
+
+## Technological Stack
+Python + AWS
+
+## Usage
+Weekly pipeline etc.
+pip package
+
+## Examples and results
