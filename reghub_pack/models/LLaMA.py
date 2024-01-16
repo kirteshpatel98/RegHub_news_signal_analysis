@@ -327,7 +327,7 @@ class LLaMA_RegHub(LLaMA2):
 
 
         # save best model
-        torch.save(checkpoint, 'BERT_classifier.pth')
+        torch.save(checkpoint, self.name)
         # torch.save(self, self.name)
         
         # delete remaining model checkpoints

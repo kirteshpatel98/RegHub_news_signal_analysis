@@ -310,7 +310,7 @@ class RoBERTa_RegHub(RoBERTaClassifier):
 
 
         # save best model
-        torch.save(checkpoint, 'RoBERTa_classifier.pth')
+        torch.save(checkpoint, self.name)
         # torch.save(self, self.name)
         
         # delete remaining model checkpoints
