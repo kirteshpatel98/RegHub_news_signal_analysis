@@ -118,7 +118,7 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
             if n==(201-self.bert.lay):
                 break
    
-    def hyper_parameters(self,epochs=100,LR=0.00001,criterion=CrossEntropyLoss(),optimizer=Adam):
+    def hyper_parameters(self,epochs=10,LR=0.00001,criterion=CrossEntropyLoss(),optimizer=Adam):
         # hyperparameters
         self.bert.epochs=epochs
         self.bert.LR=LR
@@ -153,7 +153,7 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
         
         for self.bert.epoch_num in range(self.bert.epochs): 
             
-            self.total_loss_train = 0
+            self.bert.total_loss_train = 0
 
             n=0
             
@@ -173,7 +173,7 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
                     self.bert.optimizer.step()
                     
                     # loss value
-                    self.total_loss_train += batch_loss.item()  
+                    self.bert.total_loss_train += batch_loss.item()  
                
                     p_bar.set_postfix(loss=batch_loss.item() / len(train_input['input_ids']))
                     p_bar.update()
@@ -185,6 +185,10 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
             except:
                 pass
             
+        self.delete_MLM()
+        self.weight_transfer()
+        self.save_model(save_aws=False)
+            
     def model_validation(self):
         # for validation accuracy
         
@@ -193,19 +197,20 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
 
             for val_input, val_label in self.bert.val_dataloader:
 
-                val_label = val_label['input_ids'].to(device)
-                mask = val_input['attention_mask'].to(device)
-                input_id = val_input['input_ids'].squeeze(1).to(device)
+                val_label = val_label['input_ids'].to(self.device)
+                mask = val_input['attention_mask'].to(self.device)
+                input_id = val_input['input_ids'].squeeze(1).to(self.device)
 
-                outputs = model(input_ids = input_id, attention_mask=mask,labels=val_label)
+                outputs = self.bert(input_ids = input_id, attention_mask=mask,labels=val_label)
 
                 batch_loss = outputs.loss                                        
                 # validation loss value
-                total_loss_val += batch_loss.item()
+                self.bert.total_loss_val += batch_loss.item()
 
                
                     
-        self.print_metrics()        
+        self.print_metrics() 
+        
                     
                     
     def print_metrics(self):
@@ -215,45 +220,58 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
         self.model_checkpoint_save()
         
         
-    
-        '''
 
-    def similarity_model(self, dropout=0.5):
+        
+        
+    def weight_transfer(self,):
+        #retrieve the layers
+        n1=0
+        del_layers=[]
+        for x in self.bert.state_dict():
+            n1=n1+1
+            if n1>197:
+                del_layers.append(str(x))
 
-        BertSimilarity.__init__(self)
-        use_cuda = torch.cuda.is_available()
-        device = torch.device("cuda" if use_cuda else "cpu")
-        self.device=device
-        self.to(self.device)
-        '''
+        # delete the lyers
+        state_dict = self.bert.state_dict()
+        for key in del_layers:
+            if key in state_dict:
+                del state_dict[key]
+
+        # transfer weights
+        for x, y in zip(state_dict,self.state_dict()):
+            for n in range(len(self.state_dict()[str(y)])):
+                self.state_dict()[str(y)][n] = state_dict[str(x)][n]
         
     def model_checkpoint_save(self):
         # model checkpoint
         checkpoint = {'epoch': self.bert.epoch_num+1, 'model_state_dict': self.bert.state_dict() }
 
-        torch.save(checkpoint, f'BERT_checkpoint_epoch{self.bert.epoch_num+1}.pth')
-
+        torch.save(checkpoint, f'BERT_MLM_checkpoint_epoch{self.bert.epoch_num+1}.pth')
+             
         
-        
-        
-    def save_best_model(self,save_aws=True,name='BERT_classifier.pth'):
+    def delete_MLM(self,name='BERT_similarity.pth'):
         # retrieve best checkpoint model
         self.name=name
-        checkpoint = torch.load(f'BERT_checkpoint_epoch{self.epoch_num+1-2}.pth')
+        checkpoint = torch.load(f'BERT_MLM_checkpoint_epoch{self.bert.epoch_num+1-2}.pth')
         
-        # self.load_state_dict(checkpoint['model_state_dict'])
-
-
-        # save best model
-        torch.save(checkpoint, 'BERT_classifier.pth')
-        # torch.save(self, self.name)
+        self.bert.load_state_dict(checkpoint['model_state_dict'])
         
         # delete remaining model checkpoints
-        for f in glob.glob("BERT_checkpoint*.pth"):
+        for f in glob.glob("BERT_MLM_checkpoint_epoch*.pth"):
             os.remove(f)
+            
+            
+    def save_model(self,save_aws=True,name='BERT_similarity1.pth'):
+        # retrieve best checkpoint model
+        self.name=name
+        final_checkpoint={'model_state_dict': self.state_dict() }
+        # save best model
+        torch.save(final_checkpoint, self.name)
         
         if save_aws:
             self.save_to_aws()
+        
     
     def save_to_aws(self,bucket="fs-reghub-news-analysis",awsOps=awsOps):
         with open("../aws_credentials.json", 'r') as file:
@@ -262,50 +280,9 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
         aws = awsOps(aws_creds_json)
         aws.upload_file(bucket=bucket, path=self.name, name=self.name)
         
+    def similarity(self):
+        print("in progress")
+    
+        
     
     
-    def classifier(self,F=F,torch=torch,input_text="Commerzbank faced bankrupcy today",table_format=False,df_test=None,Dataset=Dataset,pd=pd,custom_model=None,tokenizer=tokenizer_BERT):
-        
-        if custom_model != None:
-            self.load_model(model_name=custom_model,torch=torch)
-            
-        if table_format==True:
-            df_test['target']=1
-            batch_size=len(df_test)
-        else:
-            df_test=pd.DataFrame({'news_content':[input_text],'target':[1]})
-            batch_size=1
-               
-        test = Dataset(df_test,tokenizer=tokenizer)
-
-        test_dataloader = torch.utils.data.DataLoader(test, batch_size=batch_size)
-        
-        
-        with torch.no_grad():
-            for test_input,_ in test_dataloader:
-                mask = test_input['attention_mask'].to(self.device)
-                input_id = test_input['input_ids'].squeeze(1).to(self.device)
-                output = self(input_id, mask)
-                output=F.softmax(output).squeeze()*100
-                if table_format==True:
-                    df_test['legal']=output[0].item()
-                    df_test['sanctions']=output[1].item()
-                    df_test['papers']=output[2].item()
-                    df_test['reports']=output[3].item()
-                    df_test['statements']=output[4].item()
-                    df_test['guidelines']=output[5].item()
-                    df_test['press']=output[6].item()
-                    df_test['personnel']=output[7].item()
-                    df_test['market']=output[8].item()
-                    return df_test
-                
-                else:
-                    print('legal',output[0].item(),'%')
-                    print('sanctions',output[1].item(),'%')
-                    print('papers',output[2].item(),'%')
-                    print('reports',output[3].item(),'%')
-                    print('statements',output[4].item(),'%')
-                    print('guidelines',output[5].item(),'%')
-                    print('press',output[6].item(),'%')
-                    print('personnel',output[7].item(),'%')
-                    print('market',output[8].item(),'%')

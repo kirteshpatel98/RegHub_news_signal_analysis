@@ -314,7 +314,7 @@ class BERT_RegHub(BertClassifier):
 
 
         # save best model
-        torch.save(checkpoint, 'BERT_classifier.pth')
+        torch.save(checkpoint, self.name)
         # torch.save(self, self.name)
         
         # delete remaining model checkpoints
