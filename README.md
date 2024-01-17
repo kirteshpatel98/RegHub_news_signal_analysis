@@ -21,6 +21,8 @@ Rule-based labelling of the news articles into one or more of the following cate
 ### 3_Modelling
 Testing various supervised deep learning algorithms, using the rule-based labels for training and testing. We settled on BERT as our primary model for categorization.
 Next to categorization we also include a short summary of the relevant events within the category. To generate this summary, Llama2 was used.
+Alongside as part of information retrieval from the news articles we also used name entity recognision models to extract the name entities.
+Also a similarity analysis was performed by training BERT-MLM, which can be used to filter out duplicate news articles.
 ### reghub_pack
 This folder is used to package the models, to be able to release them as a pip package later on.
 
