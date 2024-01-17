@@ -131,9 +131,11 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
         self.bert.batch_size=batch_size
         self.bert.train_data=train_data
         self.bert.val_data=val_data
+        self.tokenizer = tokenizer
+        
         # initialize parent class Dataset
-        self.bert.train_d=Dataset(df = self.bert.train_data,tokenizer=tokenizer)
-        self.bert.val_d=Dataset(df = self.bert.val_data,tokenizer=tokenizer)
+        self.bert.train_d=Dataset(df = self.bert.train_data,tokenizer=self.tokenizer)
+        self.bert.val_d=Dataset(df = self.bert.val_data,tokenizer=self.tokenizer)
         
         
         self.bert.train_dataloader = DataLoader(self.bert.train_d, batch_size=self.bert.batch_size)
@@ -280,9 +282,34 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
         aws = awsOps(aws_creds_json)
         aws.upload_file(bucket=bucket, path=self.name, name=self.name)
         
-    def similarity(self):
-        print("in progress")
-    
+    def similarity_output(self,text1,text2):
+        input1 = self.tokenizer(text1)
+        input2 = self.tokenizer(text2)
+        
+        output1 = self(**input1)
+        output2 = self(**input2)
+
+        output1 = output1[0].squeeze() 
+        output2 = output2[0].squeeze()
+        
+        print(self.cosine_similarity(output1, output2)
+        
+    def cosine_similarity(self,tensor_a, tensor_b):
+        # normalize 
+        norm_a = torch.norm(tensor_a)
+        normalized_a = tensor_a / norm_a
+
+        # normalize 
+        norm_b = torch.norm(tensor_b)
+        normalized_b = tensor_b / norm_b
+
+        # dot product
+        cos_similarity = torch.dot(normalized_a.flatten(), normalized_b.flatten())
+
+        return cos_similarity
+        
+
+        
         
     
     
