@@ -31,7 +31,7 @@ Collection of scripts that where used and or tested in the course of this projec
 This folder is used to package the models, to be able to release them as a pip package later on.
 
 ## Usage
-The file run_weekly_analysis.py can be used to analyse the additional news articles of every week. It runs through the whole pipeline of BERT categorization and Llama2 summarization.
+The run file in the weekly analysis folder can be used to analyse the additional news articles of every week. It runs through the whole pipeline of BERT categorization and Llama2 summarization.
 
 ## Examples and results
 See the presentation of this project: LINK
