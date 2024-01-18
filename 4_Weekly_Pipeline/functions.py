@@ -1,3 +1,7 @@
+"""
+Functions needed for the corresponding run-file.
+"""
+
 # Import necessary libraries
 import base64
 import boto3
@@ -9,6 +13,7 @@ from langchain.llms import Ollama
 def onedrive_download(link):
     """
     Retrieve csvs from onedrive.
+    Has been replaced by aws.
     """
 
     # What is happening?
@@ -99,7 +104,9 @@ def create_rule_cats(df, cats):
 
 def split_cat_df(df, cats):
     """
-    Description
+    Splitting the df into the different categories
+    to run them through different individual 
+    Llama2 prompts later.
     """
 
     categories = list(cats.columns)
@@ -112,7 +119,7 @@ def split_cat_df(df, cats):
 
 def create_llama2_cols(df_dict, df_prompts):
     """
-    DDD
+    Create the Llama2 based summaries based on the given category.
     """
 
     # Import model
@@ -132,3 +139,11 @@ def create_llama2_cols(df_dict, df_prompts):
         dfs_llm_split.append(df)
         
     return dfs_llm_split
+
+def create_bert_cats(df):
+    """
+    Categorization using the BERT model.
+    """
+
+
+    return df

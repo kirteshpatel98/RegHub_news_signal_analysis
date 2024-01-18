@@ -5,7 +5,7 @@ We are data science master students at Frankfurt School of Finance and Managemen
 
 ## Descripton of folders
 ### 1_Exploratoy_Data_Analysis
-General exploration of the dataset. Visualization of various metrics including entity regocnition, ... and ...
+General exploration of the dataset and various visualizations.
 ### 2_Data_Preprocessing
 Rule-based labelling of the news articles into one or more of the following categories:
 - legal
@@ -23,6 +23,10 @@ Testing various supervised deep learning algorithms, using the rule-based labels
 Next to categorization we also include a short summary of the relevant events within the category. To generate this summary, Llama2 was used.
 Alongside as part of information retrieval from the news articles we also used name entity recognision models to extract the name entities.
 Also a similarity analysis was performed by training BERT-MLM, which can be used to filter out duplicate news articles.
+### 4_Weekly_Pipeline
+Script that runs through the whole process of categorization and llama2 summary creation for a given dataset. Can be run at specified intervals to cover new news articles.
+### 5_Misc
+Collection of scripts that where used and or tested in the course of this project, but don't belong into the final main folders.
 ### reghub_pack
 This folder is used to package the models, to be able to release them as a pip package later on.
 
@@ -30,4 +34,4 @@ This folder is used to package the models, to be able to release them as a pip p
 The file run_weekly_analysis.py can be used to analyse the additional news articles of every week. It runs through the whole pipeline of BERT categorization and Llama2 summarization.
 
 ## Examples and results
-Some screenshot of BERT categorization etc.
+See the presentation of this project: LINK
