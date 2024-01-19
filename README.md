@@ -38,18 +38,21 @@ See the presentation of this project: LINK
 
 ## Instructions to use reghub wrapper package
 ### Step I
-Install dependent packages:
+Install dependent packages: (terminal)
 ```
 conda env create -n myenv -f transformer_timeseries.yml
 ```     
 ### Step II
-Clone repository
+Clone repository: (terminal)
 ```
 git clone https://github.com/yuqinie98/PatchTST
 ```
 
 ### Step III
-Import model classes from 
+Import model classes from (python)
 ```
-xxx
+import sys
+sys.path.append("..")
+# Example to import BERT classification model
+from reghub_pack.models import BERT_RegHub
 ```
