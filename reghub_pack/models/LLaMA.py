@@ -82,7 +82,7 @@ class LLaMA_RegHub(LLaMA2):
         super(LLaMA_RegHub, self).__init__()
         # super(LLaMA_RegHub, self).from_pretrained(model_name)
         
-    def load_model(self,model_name='LLaMA_generative.pth',torch=torch,from_aws=False):
+    def load_model(self,model_name='LLaMA_generative.pth',torch=torch,from_aws=False,bucket="fs-reghub-news-analysis"):
         if from_aws:
             with open("../aws_credentials.json", 'r') as file:
                 aws_creds_json = json.load(file)

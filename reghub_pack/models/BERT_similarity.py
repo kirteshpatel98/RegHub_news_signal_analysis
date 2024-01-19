@@ -89,7 +89,7 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
         use_cuda = torch.cuda.is_available()
         self.bert.to(self.device)
       
-    def load_model(self,model_name='BERT_similarity.pth',torch=torch,from_aws=False):
+    def load_model(self,model_name='BERT_similarity.pth',torch=torch,from_aws=False,bucket="fs-reghub-news-analysis"):
         if from_aws:
             with open("../aws_credentials.json", 'r') as file:
                 aws_creds_json = json.load(file)
@@ -282,18 +282,6 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
         aws = awsOps(aws_creds_json)
         aws.upload_file(bucket=bucket, path=self.name, name=self.name)
         
-    def similarity_output(self,text1,text2):
-        input1 = self.tokenizer(text1)
-        input2 = self.tokenizer(text2)
-        
-        output1 = self(**input1)
-        output2 = self(**input2)
-
-        output1 = output1[0].squeeze() 
-        output2 = output2[0].squeeze()
-        
-        print(self.cosine_similarity(output1, output2)
-        
     def cosine_similarity(self,tensor_a, tensor_b):
         # normalize 
         norm_a = torch.norm(tensor_a)
@@ -308,8 +296,14 @@ class BERT_RegHub_Similarity(BertSimilarity,BertMLM):
 
         return cos_similarity
         
+    def similarity_output(self,text1,text2):
+        input1 = self.tokenizer(text1)
+        input2 = self.tokenizer(text2)
+        
+        output1 = self(**input1)
+        output2 = self(**input2)
 
+        output1 = output1[0].squeeze() 
+        output2 = output2[0].squeeze()
         
-        
-    
-    
+        print(self.cosine_similarity(output1, output2))

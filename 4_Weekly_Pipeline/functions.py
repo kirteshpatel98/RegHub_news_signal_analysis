@@ -9,6 +9,9 @@ import pandas as pd
 from io import BytesIO
 from langchain.llms import Ollama
 
+import sys
+
+
 # Define necessary functions
 def onedrive_download(link):
     """
@@ -141,9 +144,12 @@ def create_llama2_cols(df_dict, df_prompts):
     return dfs_llm_split
 
 def create_bert_cats(df):
-    """
-    Categorization using the BERT model.
-    """
+    sys.path.append("..")
+    # Add the parent directory to the Python path
+    from reghub_pack.models import BERT_RegHub
+    model=BERT_RegHub()
+    model.load_model(from_aws=True)
+    model.classifier(input_text="Commerzbank faced bankrupcy today")
 
 
     return df

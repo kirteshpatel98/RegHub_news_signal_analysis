@@ -83,7 +83,7 @@ class RoBERTa_RegHub(RoBERTaClassifier):
         self.device=device
         self.to(self.device)
         
-    def load_model(self,model_name='RoBERTa_classifier.pth',torch=torch,from_aws=False):
+    def load_model(self,model_name='RoBERTa_classifier.pth',torch=torch,from_aws=False,bucket="fs-reghub-news-analysis"):
         if from_aws:
             with open("../aws_credentials.json", 'r') as file:
                 aws_creds_json = json.load(file)

@@ -25,10 +25,10 @@ from ..Dataset import *
 from ..general_functions import *
 from ..tokenizer import tokenizer_BERT
 
-%%capture
+'''
 !python -m spacy download en_core_web_lg
 !python -m spacy download de_core_web_lg
-
+'''
 
 
 class spaCy_NER_en:
