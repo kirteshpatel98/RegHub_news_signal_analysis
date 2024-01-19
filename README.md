@@ -34,7 +34,7 @@ This folder is used to package the models, to be able to release them as a pip p
 The run file in the weekly analysis folder can be used to analyse the additional news articles of every week. It runs through the whole pipeline of BERT categorization and Llama2 summarization.
 
 ## Examples and results
-See the presentation of this project: LINK
+See the presentation of this project: https://1drv.ms/b/s!AsfpqRPTBA6DvH3pPeYWj7ub28lM?e=BIp20h
 
 ## Instructions to use reghub wrapper package
 ### Step I
