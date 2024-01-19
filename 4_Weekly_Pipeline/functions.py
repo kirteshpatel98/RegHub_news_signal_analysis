@@ -3,29 +3,12 @@ Functions needed for the corresponding run-file.
 """
 
 # Import necessary libraries
-import base64
 import boto3
 import pandas as pd
 from io import BytesIO
 from langchain.llms import Ollama
 
-import sys
-
-
 # Define necessary functions
-def onedrive_download(link):
-    """
-    Retrieve csvs from onedrive.
-    Has been replaced by aws.
-    """
-
-    # What is happening?
-    data = base64.b64encode(bytes(link, 'utf-8'))
-    data_string = data.decode('utf-8').replace('/','_').replace('+','-').rstrip("=")
-    download_url = f"https://api.onedrive.com/v1.0/shares/u!{data_string}/root/content"
-    
-    return download_url
-
 class awsOps:
     def __init__(self, creds, service="s3", region="eu-central-1"):
         self.aws_creds = {
@@ -61,48 +44,70 @@ class awsOps:
         files = [obj.key for obj in bucket.objects.all()]
         return files
 
-def create_rule_cats(df, cats):
+def create_rule_cats(df, df_categories):
     """
     Create rule-based categories.
     """
 
-    # Transform different categories to lists
-    pers_cat_words = list(cats["personnel"].dropna())
-    prod_cat_words = list(cats["product"].dropna())
-    colab_cat_words = list(cats["collaboration"].dropna())
-    legal_cat_words = list(cats["legal"].dropna())
+    # Add spaces before and after the strings to avoid 
+    # partially matching wrong words with short keys
+    df_categories = df_categories.map(lambda x: f' {x} ')
 
-    # Add columns for rule-based labels
-    df["rule_labels_pers"] = "Other"
-    df["rule_labels_prod"] = "Other"
-    df["rule_labels_colab"] = "Other"
-    df["rule_labels_legal"] = "Other"
+    # Clean the df
+    df.dropna(subset=["news_content"], inplace=True)
 
-    # Match words from the category lists
-    for index, row in df.iterrows():
-        if any(word.lower() in row["news_content"].lower(
-        ) for word in pers_cat_words):
-            df.at[index, "rule_labels_pers"] = "personnel"
-        if any(word.lower() in row["news_content"].lower(
-        ) for word in prod_cat_words):
-            df.at[index, "rule_labels_prod"] = "product"
-        if any(word.lower() in row["news_content"].lower(
-        ) for word in colab_cat_words):
-            df.at[index, "rule_labels_colab"] = "collaboration"
-        if any(word.lower() in row["news_content"].lower(
-        ) for word in legal_cat_words):
-            df.at[index, "rule_labels_legal"] = "legal"
+    # Create a list of the newly created columns for later use
+    rule_cols = []
+    # Create rule based category labels
+    for category in df_categories.columns:
+        # Keep track of which keywords led to categorization
+        df_categories[f"{category}_count"] = 0
+        # Add columns for rule-based labels
+        df[f"rule_labels_{category}"] = "Other"
+        rule_cols.append(f"rule_labels_{category}")
+        # Match words from the category lists
+        for index, row in df.iterrows():
+            for word in list(df_categories[category].dropna()):
+                if word.lower() in str(row["news_content"]).lower():
+                    df.at[index, f"rule_labels_{category}"] = category
+                    df_categories.loc[df_categories[category] == word, f"{category}_count"] += 1
 
-    # Compress the four category columns into one
-    df['rule_labels_comb'] = df[['rule_labels_pers', 'rule_labels_prod',
-                                 'rule_labels_colab', 'rule_labels_legal']
-                                 ].values.tolist()
-    df['rule_labels_comb'] = df['rule_labels_comb'
-    ].apply(lambda lst: [val for val in lst if val != 'Other'])
-    df.drop(columns=["rule_labels_pers", "rule_labels_prod",
-                     "rule_labels_colab", "rule_labels_legal"
-                     ], inplace=True)
+    # Compress the nine category columns into one
+    df['rule_labels_comb'] = df[rule_cols].values.tolist()
+    df['rule_labels_comb'] = df['rule_labels_comb'].apply(lambda lst: [val for val in lst if val != 'Other'])
+    df.drop(columns=rule_cols, inplace=True)
     
+    return df
+
+def create_bert_cats(df, df_categories):
+    """
+    Categorization using the BERT model.
+    """
+
+    # Import the BERT model
+    #sys.path.append("..")
+    # Add the parent directory to the Python path
+    from reghub_pack.models.BERT import BERT_RegHub
+    model = BERT_RegHub()
+    model.load_model(from_aws=True)
+    
+    # Clean the df
+    df.dropna(subset=["news_content"], inplace=True)
+    
+    # Create a list of the newly created columns for later use
+    bert_cols = []
+    # Create bert based category labels
+    for category in df_categories.columns:
+            # Add columns for bert-based labels
+        df[f"bert_labels_{category}"] = "Other"
+        bert_cols.append(f"bert_labels_{category}")
+        # Find suiting categories using bert
+        for index, row in df.iterrows():
+            bert_out = model.classifier(input_text=str(row["news_content"]))
+            print(bert_out)
+
+            df.at[index, f"bert_labels_{category}"] = category
+
     return df
 
 def split_cat_df(df, cats):
@@ -116,7 +121,8 @@ def split_cat_df(df, cats):
     dfs_split = {}
     for category in categories:
         df_split = df[df['rule_labels_comb'].apply(lambda lst: category in lst)]
-        dfs_split[category] = df_split
+        if not df_split.empty:
+            dfs_split[category] = df_split
 
     return dfs_split
 
@@ -132,7 +138,12 @@ def create_llama2_cols(df_dict, df_prompts):
     dfs_llm_split = []
     for key, df in df_dict.items():
         df = df[["id", "news_content"]].copy()
-        df[f"{key}_prompt"] = df["news_content"] + df_prompts[key][0]
+        prompts = []
+        for index, row in df.iterrows():
+            prompt = df_prompts[key][0
+                    ].format(article=row["news_content"])
+            prompts.append(prompt)
+        df[f"{key}_prompt"] = prompts
         df[f"{key}_llama"] = ""
         # Result for each row
         df[f"{key}_llama"
@@ -142,14 +153,3 @@ def create_llama2_cols(df_dict, df_prompts):
         dfs_llm_split.append(df)
         
     return dfs_llm_split
-
-def create_bert_cats(df):
-    sys.path.append("..")
-    # Add the parent directory to the Python path
-    from reghub_pack.models import BERT_RegHub
-    model=BERT_RegHub()
-    model.load_model(from_aws=True)
-    model.classifier(input_text="Commerzbank faced bankrupcy today")
-
-
-    return df

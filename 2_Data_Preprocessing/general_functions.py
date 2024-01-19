@@ -27,7 +27,7 @@ class awsOps:
         return "File downloaded"
 
     def upload_file(self, bucket, path, name):
-        self.s3.upload_file(path, bucket, name)
+        self.s3.upload_file(bucket, path, name)
         return "File uploaded"
     
     def delete_file(self, bucket, file):
