@@ -86,7 +86,7 @@ def create_bert_cats(df, df_categories):
     """
 
     # Import the BERT model
-    sys.path.append("..")
+    sys.path.append("../RegHub_news_signal_analysis")
     # Add the parent directory to the Python path
     from reghub_pack.models.BERT import BERT_RegHub
     model = BERT_RegHub()
