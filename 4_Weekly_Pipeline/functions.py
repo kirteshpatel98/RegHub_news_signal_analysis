@@ -3,6 +3,7 @@ Functions needed for the corresponding run-file.
 """
 
 # Import necessary libraries
+import sys
 import boto3
 import pandas as pd
 from io import BytesIO
@@ -85,7 +86,7 @@ def create_bert_cats(df, df_categories):
     """
 
     # Import the BERT model
-    #sys.path.append("..")
+    sys.path.append("..")
     # Add the parent directory to the Python path
     from reghub_pack.models.BERT import BERT_RegHub
     model = BERT_RegHub()
@@ -104,9 +105,25 @@ def create_bert_cats(df, df_categories):
         # Find suiting categories using bert
         for index, row in df.iterrows():
             bert_out = model.classifier(input_text=str(row["news_content"]))
-            print(bert_out)
 
-            df.at[index, f"bert_labels_{category}"] = category
+            # Work with bert dictionary output
+            max_key = max(bert_out, key=bert_out.get)
+            if max_key > 50:
+                df.at[index, f"bert_labels_{max_key}"] = max_key
+            else:
+                # Find highest
+                first_max_key = max(bert_out, key=bert_out.get)
+                bert_out.pop(max_key)
+                # And second highest category
+                second_max_key = max(bert_out, key=bert_out.get)
+                # Add to df
+                df.at[index, f"bert_labels_{first_max_key}"] = first_max_key
+                df.at[index, f"bert_labels_{second_max_key}"] = second_max_key
+
+    # Compress the nine category columns into one
+    df['bert_labels_comb'] = df[bert_cols].values.tolist()
+    df['bert_labels_comb'] = df['bert_labels_comb'].apply(lambda lst: [val for val in lst if val != 'Other'])
+    df.drop(columns=bert_cols, inplace=True)
 
     return df
 

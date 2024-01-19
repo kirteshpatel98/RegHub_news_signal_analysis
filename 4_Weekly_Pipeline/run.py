@@ -22,17 +22,19 @@ with open("aws_credentials.json", 'r') as file:
 # Specify s3 bucket
 bucket = "fs-reghub-news-analysis"
 
-# Connect to aws and dowload the files
+# Connect to aws and dowload the files (Limited number of news df for testing)
 aws = awsOps(aws_creds_json)
 df_news = aws.get_df(bucket=bucket, file="data_raw_extended.csv")[:10]
 df_categories = aws.get_df(bucket=bucket, file="rule_labels_v1.csv").drop(columns="Unnamed: 0")
 df_prompts = aws.get_df(bucket=bucket, file="llama_prompts_v2.csv").drop(columns="Unnamed: 0")
 
 # Create suiting rule based categories
-df_news_rule_cat = create_rule_cats(df_news, df_categories)
+#df_news_rule_cat = create_rule_cats(df_news, df_categories)
 
 # Create suiting BERT based categories
-#df_news_bert_cat = create_bert_cats(df_news, df_categories)
+df_news_bert_cat = create_bert_cats(df_news, df_categories)
+
+print(df_news_bert_cat)
 
 # For now we continue with rule-based
 df_news_cat = df_news_rule_cat
