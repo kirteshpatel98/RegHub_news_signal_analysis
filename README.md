@@ -52,7 +52,7 @@ git clone https://github.com/yuqinie98/PatchTST
 Import model classes from (python)
 ```
 import sys
-sys.path.append("..")
+# sys.path.append("..")
 # Example to import BERT classification model
 from reghub_pack.models import BERT_RegHub
 ```
