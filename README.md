@@ -35,3 +35,21 @@ The run file in the weekly analysis folder can be used to analyse the additional
 
 ## Examples and results
 See the presentation of this project: LINK
+
+## Instructions to use reghub wrapper package
+### Step I
+Install dependent packages:
+```
+conda env create -n myenv -f transformer_timeseries.yml
+```     
+### Step II
+Clone repository
+```
+git clone https://github.com/yuqinie98/PatchTST
+```
+
+### Step III
+Import model classes from 
+```
+xxx
+```
