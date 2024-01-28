@@ -40,7 +40,7 @@ See the presentation of this project: https://1drv.ms/b/s!AsfpqRPTBA6DvH3pPeYWj7
 ### Step I
 Install dependent packages: (terminal)
 ```
-conda env create -n myenv -f transformer_timeseries.yml
+conda env create -n myenv -f reghub_packages.yml
 ```     
 ### Step II
 Clone repository: (terminal)
