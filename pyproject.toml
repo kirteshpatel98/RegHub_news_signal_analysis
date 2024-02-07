@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "reghub-pack"
+version = "0.1.0"
+description = ""
+authors = ["kirteshpatel98 <kirteshpatel98@gmail.com>", "nilsmart96", "lily3678 <QP3G_2ED@proton.me>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
