@@ -41,10 +41,10 @@ jobs:
     - name: Build package
       run: poetry build
 
-    - name: Configure PyPI repository
+    - name: Configure PyPi repository
       run: poetry config repositories.pypi https://pypi.org/legacy/
 
-    - name: Configure PyPI token
+    - name: Configure PyPi token
       run: poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
 
     - name: Publish package
