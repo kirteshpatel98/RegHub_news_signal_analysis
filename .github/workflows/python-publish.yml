@@ -41,14 +41,14 @@ jobs:
     - name: Build package
       run: poetry build
 
-    - name: Configure TestPyPI repository
-      run: poetry config repositories.testpypi https://test.pypi.org/legacy/
+    - name: Configure PyPI repository
+      run: poetry config repositories.pypi https://pypi.org/legacy/
 
-    - name: Configure TestPyPI token
-      run: poetry config pypi-token.testpypi ${{ secrets.TESTPYPI_TOKEN }}
+    - name: Configure PyPI token
+      run: poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
 
     - name: Publish package
-      run: poetry publish --repository testpypi
+      run: poetry publish --repository pypi
       if: github.ref == 'refs/heads/reghub_pack'
 
   
