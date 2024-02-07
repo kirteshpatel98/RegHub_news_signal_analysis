@@ -42,7 +42,7 @@ jobs:
       run: poetry build
 
     - name: Configure PyPi repository
-      run: poetry config repositories.pypi https://pypi.org/legacy/
+      run: poetry config repositories.pypi https://upload.pypi.org/legacy/
 
     - name: Configure PyPi token
       run: poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
