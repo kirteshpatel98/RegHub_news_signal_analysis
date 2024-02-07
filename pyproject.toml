@@ -1,8 +1,12 @@
 [tool.poetry]
 name = "reghub-pack"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
-authors = ["kirteshpatel98 <kirteshpatel98@gmail.com>", "nilsmart96", "lily3678 <QP3G_2ED@proton.me>"]
+authors = [
+    { name = "Kirtesh", email = "kirteshpatel98@gmail.com" },
+    { name = "Nils", email = "author2@example.com" },
+    { name = "Xiang", email = "QP3G_2ED@proton.me" }
+]
 license = "MIT"
 readme = "README.md"
 
