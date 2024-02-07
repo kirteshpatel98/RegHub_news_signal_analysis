@@ -2,11 +2,8 @@
 name = "reghub-pack"
 version = "0.1.2"
 description = ""
-authors = [
-    { name = "Kirtesh", email = "kirteshpatel98@gmail.com" },
-    { name = "Nils", email = "author2@example.com" },
-    { name = "Xiang", email = "QP3G_2ED@proton.me" }
-]
+authors = ["Kirtesh <kirteshpatel98@gmail.com>", "Nils <author2@example.com>", "Xiang <QP3G_2ED@proton.me>"]
+
 license = "MIT"
 readme = "README.md"
 
