@@ -48,7 +48,7 @@ jobs:
       run: poetry config pypi-token.testpypi ${{ secrets.TESTPYPI_TOKEN }}
 
     - name: Publish package
-      run: poetry publish --repository testpypi --username ${{ secrets.TESTPYPI_USERNAME }} --password ${{ secrets.TESTPYPI_PASSWORD }}
+      run: poetry publish --repository testpypi
       if: github.ref == 'refs/heads/reghub_pack'
 
   
