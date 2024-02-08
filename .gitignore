@@ -1,0 +1,11 @@
+*.pyc
+.ipynb_checkpoints/
+*.csv
+*.xls
+*.ppt
+*.pth
+*.json
+.DS_Store
+path_to_save_model
+path_to_save_tokenizer
+__pycache__
