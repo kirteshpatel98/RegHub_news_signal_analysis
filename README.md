@@ -37,22 +37,49 @@ The run file in the weekly analysis folder can be used to analyse the additional
 See the presentation of this project: https://1drv.ms/b/s!AsfpqRPTBA6DvH3pPeYWj7ub28lM?e=BIp20h
 
 ## Instructions to use reghub wrapper package
+### Using PiP
+```
+pip install reghub-pack
+```
+
+### If the above method doesn't work, try using poetry
 ### Step I
 Install dependent packages: (terminal)
 ```
 conda env create -n myenv -f reghub_packages.yml
 ```     
 ### Step II
-Clone repository: (terminal)
+Clone repository branch: (terminal)
 ```
-git clone https://github.com/yuqinie98/PatchTST
+git clone -b reghub_pack https://github.com/kirteshpatel98/RegHub_news_signal_analysis
 ```
 
 ### Step III
-Import model classes from (python)
+Change directory to the clone repo
 ```
-import sys
-# sys.path.append("..")
-# Example to import BERT classification model
-from reghub_pack.models import BERT_RegHub
+cd */RegHub_news_signal_analysis
+```
+
+### Step IV
+Install poetry
+```
+pip install poetry
+```
+
+### Step V
+Build poetry
+```
+poetry build
+```
+
+### Step VI
+Add package to your environment
+```
+pip install .
+```
+
+### Step VII
+Import package in python
+```
+import reghub-pack
 ```
