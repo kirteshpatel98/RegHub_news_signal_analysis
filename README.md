@@ -38,8 +38,14 @@ See the presentation of this project: https://1drv.ms/b/s!AsfpqRPTBA6DvH3pPeYWj7
 
 ## Instructions to use reghub wrapper package
 ### Using PiP
+### Step I
 ```
 pip install reghub-pack
+```
+
+### Step II
+```
+import reghub_pack
 ```
 
 ### If the above method doesn't work, try using poetry
@@ -81,5 +87,5 @@ pip install .
 ### Step VII
 Import package in python
 ```
-import reghub-pack
+import reghub_pack
 ```
