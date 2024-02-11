@@ -45,6 +45,5 @@ jobs:
 
     - name: Publish package
       run: poetry publish --repository pypi
-      if: github.ref == 'refs/heads/reghub_pack'
 
   
