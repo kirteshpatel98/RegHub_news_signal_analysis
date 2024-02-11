@@ -9,12 +9,8 @@
 name: Python Package CI
 
 on:
-  push:
-    branches:
-      - reghub_pack
-  pull_request:
-    branches:
-      - reghub_pack
+  release:
+    types: [publish]
 
 permissions:
   contents: read
