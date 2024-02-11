@@ -10,7 +10,7 @@ name: Python Package CI
 
 on:
   release:
-    types: [publish]
+    types: [published]
 
 permissions:
   contents: read
