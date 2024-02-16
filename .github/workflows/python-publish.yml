@@ -9,12 +9,8 @@
 name: Python Package CI
 
 on:
-  push:
-    branches:
-      - reghub_pack
-  pull_request:
-    branches:
-      - reghub_pack
+  release:
+    types: [published]
 
 permissions:
   contents: read
@@ -49,6 +45,5 @@ jobs:
 
     - name: Publish package
       run: poetry publish --repository pypi
-      if: github.ref == 'refs/heads/reghub_pack'
 
   
